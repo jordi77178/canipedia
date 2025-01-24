@@ -8,66 +8,92 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  late List<Dog> dogs;
-  late Dog dog1;
-  late Dog dog2;
-  int score = 0;
+  late Future<List<Dog>> _dogsFuture;
+  int _questionIndex = 0;
+  bool _showAnswer = false;
 
   @override
   void initState() {
     super.initState();
-    _loadDogs();
+    _dogsFuture = DogService.loadDogs();
   }
 
-  Future<void> _loadDogs() async {
-    dogs = await DogService.loadDogs();
-    _newRound();
-  }
-
-  void _newRound() {
-    dogs.shuffle();
-    dog1 = dogs[0];
-    dog2 = dogs[1];
-    setState(() {});
-  }
-
-  void _checkAnswer(bool isDog1Taller) {
-    if ((isDog1Taller && dog1.tailleMax > dog2.tailleMax) ||
-        (!isDog1Taller && dog1.tailleMax < dog2.tailleMax)) {
-      setState(() => score++);
-    } else {
-      setState(() => score = 0);
-    }
-    _newRound();
+  void _nextQuestion() {
+    setState(() {
+      _questionIndex = (_questionIndex + 1) % 10; // Limite à 10 questions max
+      _showAnswer = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (dogs.isEmpty) return Center(child: CircularProgressIndicator());
-
     return Scaffold(
-      appBar: AppBar(title: Text("Quiz: Qui est plus grand ?")),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text("Score: $score", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-          SizedBox(height: 20),
-          _buildDogOption(dog1, true),
-          Text("OU", style: TextStyle(fontSize: 18)),
-          _buildDogOption(dog2, false),
-        ],
-      ),
-    );
-  }
+      appBar: AppBar(title: Text("Quiz sur les races")),
+      body: FutureBuilder<List<Dog>>(
+        future: _dogsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Erreur de chargement"));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text("Aucune race trouvée"));
+          }
 
-  Widget _buildDogOption(Dog dog, bool isDog1) {
-    return GestureDetector(
-      onTap: () => _checkAnswer(isDog1),
-      child: Column(
-        children: [
-          Image.network(dog.photoUrl, height: 120),
-          Text(dog.name, style: TextStyle(fontSize: 18)),
-        ],
+          final dog = snapshot.data![_questionIndex];
+
+          return Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  elevation: 5,
+                  child: Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                        child: Image.network(dog.photoUrl, height: 200, width: double.infinity, fit: BoxFit.cover),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          children: [
+                            Text(
+                              "Quelle est cette race ?",
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 10),
+                            if (_showAnswer)
+                              Text(
+                                dog.name,
+                                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.blue),
+                              ),
+                            SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  _showAnswer = true;
+                                });
+                              },
+                              child: Text("Afficher la réponse"),
+                            ),
+                            SizedBox(height: 10),
+                            ElevatedButton(
+                              onPressed: _nextQuestion,
+                              child: Text("Question suivante"),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
