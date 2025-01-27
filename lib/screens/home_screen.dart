@@ -1,144 +1,213 @@
+import 'package:canipedia/screens/country_selection_screen.dart';
+import 'package:canipedia/screens/map_screen.dart';
 import 'package:flutter/material.dart';
-import '../models/dog.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import '../services/dog_service.dart';
+import '../models/dog.dart';
 import 'encyclopedie_screen.dart';
-import 'quiz_screen.dart';
-import 'game_guess_bigger.dart';
-import '/screens/adventure_mode_screen.dart';
+import 'dog_details_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  Dog? _featuredDog;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFeaturedDog();
+  }
+
+  Future<void> _loadFeaturedDog() async {
+    final dogs = await DogService.loadDogs();
+    if (dogs.isNotEmpty) {
+      setState(() {
+        _featuredDog = dogs[DateTime.now().day % dogs.length];
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Canipédia"),
-        centerTitle: true,
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              const SizedBox(height: 60),
+              _buildHeader().animate().fade(duration: 700.ms).slideY(begin: -0.2, curve: Curves.easeOut),
+              const SizedBox(height: 20),
+              _featuredDog != null
+                  ? _buildFeaturedDogCard().animate().scale(delay: 300.ms).fadeIn()
+                  : const CircularProgressIndicator(),
+              const SizedBox(height: 20),
+              Expanded(child: _buildMenuCarousel(context)),
+            ],
+          ),
+        ],
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      children: [
+        Text(
+          "Canipédia",
+          style: TextStyle(
+            fontSize: 34,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+            letterSpacing: 1.2,
+          ),
+          textAlign: TextAlign.center,
+        ).animate().fade(duration: 800.ms).slideY(begin: -0.2),
+        const SizedBox(height: 5),
+        Text(
+          "Découvrez chaque jour une race exceptionnelle",
+          style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeaturedDogCard() {
+    return GestureDetector(
+      onTap: () {
+        if (_featuredDog != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DogDetailsScreen(dog: _featuredDog!),
+            ),
+          );
+        }
+      },
+      child: Card(
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Stack(
           children: [
-            Text(
-              "Bienvenue sur Canipédia 🐶",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.network(
+                _featuredDog!.photoUrl,
+                height: 220,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
             ),
-            SizedBox(height: 20),
-
-            // 📌 Carte "Chien à découvrir"
-            FutureBuilder<List<Dog>>(
-              future: DogService.loadDogs(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData || snapshot.data!.isEmpty) return SizedBox();
-
-                final randomDog = (snapshot.data!..shuffle()).first;
-
-                return Card(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  elevation: 5,
-                  child: Column(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                        child: Image.network(randomDog.photoUrl, height: 150, width: double.infinity, fit: BoxFit.cover),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Column(
-                          children: [
-                            Text(
-                              "Découvre une race !",
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              randomDog.name,
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue),
-                            ),
-                            SizedBox(height: 10),
-                            ElevatedButton(
-                              onPressed: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => EncyclopedieScreen()),
-                              ),
-                              child: Text("En savoir plus"),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
+            Container(
+              height: 220,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [Colors.black.withOpacity(0.6), Colors.transparent],
+                ),
+              ),
             ),
-            SizedBox(height: 20),
-
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
+            Positioned(
+              left: 20,
+              bottom: 20,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildMenuCard(
-                    context,
-                    title: "Encyclopédie",
-                    icon: Icons.menu_book,
-                    color: Colors.blue,
-                    destination: EncyclopedieScreen(),
+                  Text(
+                    _featuredDog!.name,
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
-                  _buildMenuCard(
-                    context,
-                    title: "Quiz",
-                    icon: Icons.quiz,
-                    color: Colors.orange,
-                    destination: QuizScreen(),
-                  ),
-                  _buildMenuCard(
-                    context,
-                    title: "Devine la Race",
-                    icon: Icons.games,
-                    color: Colors.green,
-                    destination: GuessBiggerScreen(),
-                  ),
-                  _buildMenuCard(
-                    context,
-                    title: "Mode Aventure",
-                    icon: Icons.explore,
-                    color: Colors.purple,
-                    destination: AdventureModeScreen(),
+                  Text(
+                    _featuredDog!.origin,
+                    style: TextStyle(fontSize: 16, color: Colors.white70),
                   ),
                 ],
               ),
             ),
           ],
         ),
-      ),
+      ).animate().moveY(begin: 10, end: 0, duration: 1.seconds, curve: Curves.easeInOut),
     );
   }
 
-  Widget _buildMenuCard(BuildContext context, {required String title, required IconData icon, required Color color, required Widget destination}) {
+  Widget _buildMenuCarousel(BuildContext context) {
+    return CarouselSlider(
+      options: CarouselOptions(
+        height: 250, // Ajustement pour meilleure lisibilité
+        enlargeCenterPage: true,
+        autoPlay: true,
+        autoPlayInterval: Duration(seconds: 4),
+        viewportFraction: 0.8,
+        aspectRatio: 2.0,
+      ),
+      items: [
+        _buildMenuCard(context, "Encyclopédie", "assets/images/encyclopedie.png", EncyclopedieScreen()),
+        _buildMenuCard(context, "Jeux & Quiz", "assets/images/quiz.png", EncyclopedieScreen()),
+        _buildMenuCard(context, "Éducation canine", "assets/images/dressage.png", EncyclopedieScreen()),
+        _buildMenuCard(context, "Soins & Santé", "assets/images/soin.png", EncyclopedieScreen()),
+        _buildMenuCard(context, "Chiens par Pays", "assets/images/chiens_pays.png", CountrySelectionScreen()),
+      ],
+    ).animate().fade(duration: 1.seconds).slideY(begin: 0.2, curve: Curves.easeOut);
+  }
+
+// 🏆 Design amélioré pour chaque carte du menu
+  Widget _buildMenuCard(BuildContext context, String title, String imagePath, Widget destination) {
     return GestureDetector(
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => destination)),
       child: Card(
-        elevation: 5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        color: color,
-        child: Container(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 50, color: Colors.white),
-              SizedBox(height: 10),
-              Text(
-                title,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                textAlign: TextAlign.center,
+        elevation: 10,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+            // 📸 Image d’arrière-plan
+            Positioned.fill(
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
               ),
-            ],
-          ),
+            ),
+            // 🎨 Dégradé pour meilleure lisibilité
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [Colors.black.withOpacity(0.7), Colors.transparent],
+                  ),
+                ),
+              ),
+            ),
+            // 📝 Texte au centre avec effet d’apparition
+            Center(
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black54,
+                      blurRadius: 5,
+                    ),
+                  ],
+                ),
+              ).animate().fade(duration: 800.ms).scaleXY(begin: 0.9, end: 1),
+            ),
+          ],
         ),
-      ),
+      ).animate().scaleXY(begin: 0.85, end: 1, duration: 500.ms, curve: Curves.easeOut),
     );
   }
+
+
 }

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import '../services/dog_service.dart';
 import '../widgets/dog_card.dart';
 import '../models/dog.dart';
+import '/screens/home_screen.dart';
 
 class EncyclopedieScreen extends StatefulWidget {
+
   @override
+
   _EncyclopedieScreenState createState() => _EncyclopedieScreenState();
 }
 
