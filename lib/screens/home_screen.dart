@@ -1,5 +1,8 @@
 import 'package:canipedia/screens/country_selection_screen.dart';
+import 'package:canipedia/screens/education_canine/education_home_screen.dart';
+import 'package:canipedia/screens/education_screen.dart';
 import 'package:canipedia/screens/map_screen.dart';
+import 'package:canipedia/screens/soins_sante/soins_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -19,18 +22,20 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadFeaturedDog();
+    _loadFeaturedDogs();
   }
 
-  Future<void> _loadFeaturedDog() async {
+  List<Dog> _featuredDogs = []; // Liste des 4 chiens en vedette
+
+  Future<void> _loadFeaturedDogs() async {
     final dogs = await DogService.loadDogs();
-    if (dogs.isNotEmpty) {
+    if (dogs.length >= 4) {
       setState(() {
-        _featuredDog = dogs[DateTime.now().day % dogs.length];
+        int startIndex = DateTime.now().day % (dogs.length - 3);
+        _featuredDogs = dogs.sublist(startIndex, startIndex + 4); // Sélectionne 4 chiens
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,13 +43,13 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Column(
             children: [
-              const SizedBox(height: 60),
+              const SizedBox(height: 70),
               _buildHeader().animate().fade(duration: 700.ms).slideY(begin: -0.2, curve: Curves.easeOut),
-              const SizedBox(height: 20),
-              _featuredDog != null
-                  ? _buildFeaturedDogCard().animate().scale(delay: 300.ms).fadeIn()
+              const SizedBox(height: 10),
+              _featuredDogs.isNotEmpty
+                  ? _buildFeaturedDogsCarousel().animate().scale(delay: 300.ms).fadeIn()
                   : const CircularProgressIndicator(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Expanded(child: _buildMenuCarousel(context)),
             ],
           ),
@@ -53,11 +58,25 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildFeaturedDogsCarousel() {
+    return CarouselSlider(
+      options: CarouselOptions(
+        height: 230,
+        enlargeCenterPage: true,
+        autoPlay: true,
+        autoPlayInterval: Duration(seconds: 4),
+        viewportFraction: 0.85,
+        aspectRatio: 2.0,
+      ),
+      items: _featuredDogs.map((dog) => _buildFeaturedDogCard(dog)).toList(),
+    ).animate().fade(duration: 1.seconds).slideY(begin: 0.2, curve: Curves.easeOut);
+  }
+
   Widget _buildHeader() {
     return Column(
       children: [
-        Text(
-          "Canipédia",
+        const Text(
+          "CaniPédia",
           style: TextStyle(
             fontSize: 34,
             fontWeight: FontWeight.bold,
@@ -67,26 +86,22 @@ class _HomeScreenState extends State<HomeScreen> {
           textAlign: TextAlign.center,
         ).animate().fade(duration: 800.ms).slideY(begin: -0.2),
         const SizedBox(height: 5),
-        Text(
-          "Découvrez chaque jour une race exceptionnelle",
-          style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-          textAlign: TextAlign.center,
-        ),
+
+        Image.asset(
+          "assets/images/logo.webp", // Remplace par le chemin correct de ton logo
+          height: 150, // Ajuste la taille selon ton besoin
+        ).animate().fade(duration: 800.ms).scaleXY(begin: 0.9, end: 1),
       ],
     );
   }
 
-  Widget _buildFeaturedDogCard() {
+  Widget _buildFeaturedDogCard(Dog dog) {
     return GestureDetector(
       onTap: () {
-        if (_featuredDog != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DogDetailsScreen(dog: _featuredDog!),
-            ),
-          );
-        }
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => DogDetailsScreen(dog: dog)),
+        );
       },
       child: Card(
         elevation: 8,
@@ -96,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Image.network(
-                _featuredDog!.photoUrl,
+                dog.photoUrl,
                 height: 220,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -120,11 +135,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _featuredDog!.name,
+                    dog.name,
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                   Text(
-                    _featuredDog!.origin,
+                    dog.origin,
                     style: TextStyle(fontSize: 16, color: Colors.white70),
                   ),
                 ],
@@ -135,7 +150,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ).animate().moveY(begin: 10, end: 0, duration: 1.seconds, curve: Curves.easeInOut),
     );
   }
-
   Widget _buildMenuCarousel(BuildContext context) {
     return CarouselSlider(
       options: CarouselOptions(
@@ -149,8 +163,8 @@ class _HomeScreenState extends State<HomeScreen> {
       items: [
         _buildMenuCard(context, "Encyclopédie", "assets/images/encyclopedie.png", EncyclopedieScreen()),
         _buildMenuCard(context, "Jeux & Quiz", "assets/images/quiz.png", EncyclopedieScreen()),
-        _buildMenuCard(context, "Éducation canine", "assets/images/dressage.png", EncyclopedieScreen()),
-        _buildMenuCard(context, "Soins & Santé", "assets/images/soin.png", EncyclopedieScreen()),
+        _buildMenuCard(context, "Éducation canine", "assets/images/dressage.png", EducationHomeScreen()),
+        _buildMenuCard(context, "Soins & Santé", "assets/images/soin.png", SoinsHomeScreen()),
         _buildMenuCard(context, "Chiens par Pays", "assets/images/chiens_pays.png", CountrySelectionScreen()),
       ],
     ).animate().fade(duration: 1.seconds).slideY(begin: 0.2, curve: Curves.easeOut);

@@ -31,7 +31,7 @@ class CountrySelectionScreen extends StatelessWidget {
               icon: Icons.map_rounded,
               title: "Voir sur la Carte",
               subtitle: "Découvrez les races de chiens sur une carte interactive",
-              color: Colors.black12,
+              color: Colors.brown.shade300,
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => MapScreen()),
@@ -45,7 +45,7 @@ class CountrySelectionScreen extends StatelessWidget {
               icon: Icons.list_rounded,
               title: "Voir la Liste des Pays",
               subtitle: "Accédez aux races par pays dans une liste détaillée",
-              color: Colors.black54,
+              color: Colors.brown.shade300,
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => CountryListScreen()),
