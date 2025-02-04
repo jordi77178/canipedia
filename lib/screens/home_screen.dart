@@ -2,7 +2,7 @@ import 'package:canipedia/screens/country_selection_screen.dart';
 import 'package:canipedia/screens/education_canine/education_home_screen.dart';
 import 'package:canipedia/screens/education_screen.dart';
 import 'package:canipedia/screens/map_screen.dart';
-import 'package:canipedia/screens/soins_sante/soins_home_screen.dart';
+import 'package:canipedia/screens/soins_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:carousel_slider/carousel_slider.dart';

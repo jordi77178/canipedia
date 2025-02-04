@@ -1,37 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '/screens/soins_sante/vet_care/essential_vaccinations_screen.dart';
+import '/screens/soins_sante/vet_care/first_aid_screen.dart';
+import '/screens/soins_sante/vet_care/identify_health_issues_screen.dart';
+import '/screens/soins_sante/vet_care/parasites_vermifuges_screen.dart';
+import '/screens/soins_sante/vet_care/routine_visits_screen.dart';
+
+
 
 class VetCareScreen extends StatelessWidget {
   final List<Map<String, dynamic>> vetCareTips = [
     {
-      "title": "📅 Visites de routine",
+      "title": "Visites de routine",
       "description": "Un check-up annuel est essentiel pour s'assurer que votre chien est en bonne santé.",
-      "image": "assets/images/checkup.png",
-      "color": Colors.blue.shade300,
+      "image": "assets/images/soins/visiteveto.png",
+      "color": Colors.brown.shade300,
+      "page": RoutineVisitsScreen(),
     },
     {
-      "title": "💉 Vaccinations essentielles",
+      "title": "Vaccinations essentielles",
       "description": "Les vaccins préviennent de nombreuses maladies graves. Consultez votre vétérinaire pour un suivi régulier.",
-      "image": "assets/images/vaccine.png",
-      "color": Colors.green.shade400,
+      "image": "assets/images/soins/vaccin.png",
+      "color": Colors.brown.shade300,
+      "page": EssentialVaccinationsScreen(),
     },
     {
-      "title": "🦠 Parasites et vermifuges",
+      "title": "Parasites et vermifuges",
       "description": "Un traitement antiparasitaire (puces, tiques, vers) doit être administré régulièrement.",
-      "image": "assets/images/parasites.png",
-      "color": Colors.orange.shade300,
+      "image": "assets/images/soins/vermifuge.png",
+      "color": Colors.brown.shade300,
+      "page": ParasitesVermifugesScreen(),
     },
     {
-      "title": "🚑 Premiers secours",
+      "title": "Premiers secours",
       "description": "Apprenez les gestes d'urgence : hémorragies, brûlures, intoxications, etc.",
-      "image": "assets/images/first_aid.png",
-      "color": Colors.red.shade400,
+      "image": "assets/images/soins/secours.png",
+      "color": Colors.brown.shade300,
+      "page": FirstAidScreen(),
     },
     {
-      "title": "🩺 Identifier un problème de santé",
+      "title": "Identifier un problème de santé",
       "description": "Changements d’appétit, fatigue, vomissements… Repérez rapidement les signes inquiétants.",
-      "image": "assets/images/health_check.png",
-      "color": Colors.purple.shade300,
+      "image": "assets/images/soins/detecter.png",
+      "color": Colors.brown.shade300,
+      "page": IdentifyHealthIssuesScreen(),
     },
   ];
 
@@ -51,6 +63,7 @@ class VetCareScreen extends StatelessWidget {
               tip["image"],
               tip["color"],
               context,
+              tip["page"],
             );
           },
         ),
@@ -59,9 +72,18 @@ class VetCareScreen extends StatelessWidget {
   }
 
   Widget _buildVetCareCard(
-      String title, String description, String imagePath, Color bgColor, BuildContext context) {
+      String title,
+      String description,
+      String imagePath,
+      Color bgColor,
+      BuildContext context,
+      Widget page,
+      ) {
     return GestureDetector(
-      onTap: () => _showVetCareDetail(context, title, description, imagePath),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => page),
+      ),
       child: Card(
         elevation: 6,
         margin: EdgeInsets.symmetric(vertical: 10),
@@ -73,115 +95,41 @@ class VetCareScreen extends StatelessWidget {
           ),
           child: Row(
             children: [
-              // ✅ Texte à gauche (prend 70% de la largeur)
+              // Texte à gauche (70 %)
               Expanded(
-                flex: 7,
+                flex: 6,
                 child: Padding(
                   padding: EdgeInsets.all(10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        title,
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                      ),
+                      Text(title,
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
                       SizedBox(height: 5),
-                      Text(
-                        description,
-                        style: TextStyle(fontSize: 14, color: Colors.white70),
-                      ),
+                      Text(description,
+                          style: TextStyle(fontSize: 14, color: Colors.white70)),
                     ],
                   ),
                 ),
               ),
-              // ✅ Image totalement à droite (prend 30% de la largeur)
+              // Image à droite (30 %)
               Expanded(
-                flex: 3,
+                flex: 4,
                 child: ClipRRect(
                   borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(15),
-                    bottomRight: Radius.circular(15),
-                  ),
-                  child: Image.asset(
-                    imagePath,
-                    fit: BoxFit.cover,
-                    height: 150,
-                  ),
+                      topRight: Radius.circular(15),
+                      bottomRight: Radius.circular(15)),
+                  child: Image.asset(imagePath,
+                      fit: BoxFit.cover, height: 150),
                 ),
               ),
             ],
           ),
         ),
       ).animate().fade(duration: 500.ms).slideX(begin: 0.1),
-    );
-  }
-
-  void _showVetCareDetail(BuildContext context, String title, String description, String imagePath) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
-      builder: (context) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.6,
-          minChildSize: 0.4,
-          maxChildSize: 0.9,
-          builder: (context, scrollController) {
-            return ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-              child: Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-                  boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10, spreadRadius: 2)],
-                ),
-                child: Column(
-                  children: [
-                    // ✅ Titre et bouton de fermeture
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.close, size: 28, color: Colors.grey[700]),
-                          onPressed: () => Navigator.pop(context),
-                        ).animate().rotate(duration: 600.ms),
-                      ],
-                    ),
-                    Divider(),
-                    SizedBox(height: 10),
-                    // ✅ Image
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Image.asset(imagePath, height: 150, fit: BoxFit.cover),
-                    ).animate().fade(duration: 500.ms).scaleXY(begin: 0.9, end: 1),
-                    SizedBox(height: 15),
-                    // ✅ Description détaillée
-                    Expanded(
-                      child: SingleChildScrollView(
-                        controller: scrollController,
-                        child: Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Text(
-                            description,
-                            style: TextStyle(fontSize: 16, height: 1.5),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
     );
   }
 }

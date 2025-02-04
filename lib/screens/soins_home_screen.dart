@@ -1,43 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'nutrition_screen.dart';
-import 'hygiene_screen.dart';
-import 'vet_care_screen.dart';
-import 'diseases_screen.dart';
-import 'physical_health_screen.dart';
-import 'mental_health_screen.dart';
+import 'soins_sante/nutrition_screen.dart';
+import 'soins_sante/hygiene_screen.dart';
+import 'soins_sante/vet_care_screen.dart';
+import 'soins_sante/diseases_screen.dart';
+import 'soins_sante/physical_health_screen.dart';
+import 'soins_sante/mental_health_screen.dart';
 
 class SoinsHomeScreen extends StatelessWidget {
   final List<Map<String, dynamic>> sections = [
     {
       "title": "Nutrition & Alimentation",
       "screen": NutritionScreen(),
-      "image": "assets/images/nutrition.png"
+      "image": "assets/images/soins/nutrition.png"
     },
     {
       "title": "Hygiène & Toilettage",
       "screen": HygieneScreen(),
-      "image": "assets/images/hygiene.png"
+      "image": "assets/images/soins/hygiene.png"
     },
     {
-      "title": "Soins Vétérinaires & Premiers Secours",
+      "title": "Soins et secours",
       "screen": VetCareScreen(),
-      "image": "assets/images/vet_care.png"
+      "image": "assets/images/soins/veterinaire.png"
     },
     {
       "title": "Maladies & Prévention",
       "screen": DiseasesScreen(),
-      "image": "assets/images/diseases.png"
+      "image": "assets/images/soins/maladie.png"
     },
     {
       "title": "Activité Physique & Bien-être",
       "screen": PhysicalHealthScreen(),
-      "image": "assets/images/physical_health.png"
+      "image": "assets/images/soins/bienetre.png"
     },
     {
-      "title": "Santé Mentale & Épanouissement",
+      "title": "Santé Mentale",
       "screen": MentalHealthScreen(),
-      "image": "assets/images/mental_health.png"
+      "image": "assets/images/soins/santementale.png"
     },
   ];
 

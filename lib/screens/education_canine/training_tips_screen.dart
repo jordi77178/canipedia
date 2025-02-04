@@ -1,5 +1,14 @@
+// lib/screens/education_canine/training_tips_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+
+// Importation des pages dédiées
+import 'training_tips/patience_coherent_screen.dart';
+import 'training_tips/recompenses_motivation_screen.dart';
+import 'training_tips/ton_voix_screen.dart';
+import 'training_tips/punition_inutile_screen.dart';
+import 'training_tips/seances_frequentes_screen.dart';
+import 'training_tips/langage_canin_screen.dart';
 
 class TrainingTipsScreen extends StatelessWidget {
   final List<Map<String, dynamic>> trainingTips = [
@@ -7,32 +16,44 @@ class TrainingTipsScreen extends StatelessWidget {
       "title": "Soyez patient et cohérent",
       "description": "La clé du succès est la répétition et la patience. Un chien apprend par la constance de son maître.",
       "image": "assets/images/education/patiente.png",
-      "color": Colors.brown.shade300,    },
+      "color": Colors.brown.shade300,
+      "page": PatienceCoherentScreen(),
+    },
     {
       "title": "Récompenses et motivation",
       "description": "Bien utiliser les friandises, caresses et encouragements renforce les bons comportements.",
       "image": "assets/images/education/recompense.png",
-      "color": Colors.brown.shade300,    },
+      "color": Colors.brown.shade300,
+      "page": RecompensesMotivationScreen(),
+    },
     {
       "title": "Utilisation du bon ton de voix",
       "description": "Un ton calme et ferme est plus efficace qu’une voix agressive ou criarde.",
       "image": "assets/images/education/ton.png",
-      "color": Colors.brown.shade300,    },
+      "color": Colors.brown.shade300,
+      "page": TonVoixScreen(),
+    },
     {
       "title": "Évitez les punitions inutiles",
       "description": "Punir un chien après-coup est inefficace. Mettez l'accent sur le renforcement positif.",
       "image": "assets/images/education/punirinutile.png",
-      "color": Colors.brown.shade300,    },
+      "color": Colors.brown.shade300,
+      "page": PunitionInutileScreen(),
+    },
     {
       "title": "Courtes séances mais fréquentes",
       "description": "Des sessions courtes plusieurs fois par jour sont plus efficaces que des entraînements longs.",
       "image": "assets/images/education/chrono.png",
-      "color": Colors.brown.shade300,    },
+      "color": Colors.brown.shade300,
+      "page": SeancesFrequentesScreen(),
+    },
     {
       "title": "Comprendre le langage canin",
       "description": "Apprenez à lire les signaux de stress, de joie ou d’inconfort pour mieux communiquer.",
       "image": "assets/images/education/dialogue.png",
-      "color": Colors.brown.shade300,    },
+      "color": Colors.brown.shade300,
+      "page": LangageCaninScreen(),
+    },
   ];
 
   @override
@@ -51,6 +72,7 @@ class TrainingTipsScreen extends StatelessWidget {
               tip["image"],
               tip["color"],
               context,
+              tip["page"],
             );
           },
         ),
@@ -59,9 +81,12 @@ class TrainingTipsScreen extends StatelessWidget {
   }
 
   Widget _buildTipCard(
-      String title, String description, String imagePath, Color bgColor, BuildContext context) {
+      String title, String description, String imagePath, Color bgColor, BuildContext context, Widget page) {
     return GestureDetector(
-      onTap: () => _showTipDetail(context, title, description, imagePath),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => page),
+      ),
       child: Card(
         elevation: 6,
         margin: EdgeInsets.symmetric(vertical: 10),
@@ -69,11 +94,11 @@ class TrainingTipsScreen extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
-            color: bgColor ?? Colors.grey, // Couleur de fond avec valeur par défaut
+            color: bgColor ?? Colors.grey,
           ),
           child: Row(
             children: [
-              // ✅ Texte à gauche (prend 70% de la largeur)
+              // Texte à gauche (70%)
               Expanded(
                 flex: 7,
                 child: Padding(
@@ -94,7 +119,7 @@ class TrainingTipsScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              // ✅ Image totalement à droite (prend 30% de la largeur)
+              // Image à droite (30%)
               Expanded(
                 flex: 4,
                 child: ClipRRect(
@@ -105,7 +130,7 @@ class TrainingTipsScreen extends StatelessWidget {
                   child: Image.asset(
                     imagePath,
                     fit: BoxFit.cover,
-                    height: 150, // Ajustable selon la hauteur de la carte
+                    height: 150,
                   ),
                 ),
               ),
@@ -113,75 +138,6 @@ class TrainingTipsScreen extends StatelessWidget {
           ),
         ),
       ).animate().fade(duration: 500.ms).slideX(begin: 0.1),
-    );
-  }
-
-  void _showTipDetail(BuildContext context, String title, String description, String imagePath) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
-      builder: (context) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.6,
-          minChildSize: 0.4,
-          maxChildSize: 0.9,
-          builder: (context, scrollController) {
-            return ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-              child: Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-                  boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10, spreadRadius: 2)],
-                ),
-                child: Column(
-                  children: [
-                    // ✅ Titre et bouton de fermeture
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.close, size: 28, color: Colors.grey[700]),
-                          onPressed: () => Navigator.pop(context),
-                        ).animate().rotate(duration: 600.ms),
-                      ],
-                    ),
-                    Divider(),
-                    SizedBox(height: 10),
-                    // ✅ Image
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Image.asset(imagePath, height: 150, fit: BoxFit.cover),
-                    ).animate().fade(duration: 500.ms).scaleXY(begin: 0.9, end: 1),
-                    SizedBox(height: 15),
-                    // ✅ Description
-                    Expanded(
-                      child: SingleChildScrollView(
-                        controller: scrollController,
-                        child: Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Text(
-                            description,
-                            style: TextStyle(fontSize: 16, height: 1.5),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
     );
   }
 }

@@ -1,43 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '/screens/soins_sante/mental_health/exercice_depense_screen.dart';
+import '/screens/soins_sante/mental_health/musique_apaisante_screen.dart';
+import '/screens/soins_sante/mental_health/jeux_intelligence_screen.dart';
+import '/screens/soins_sante/mental_health/massage_caresse_screen.dart';
+import '/screens/soins_sante/mental_health/routines_repere_screen.dart';
+import '/screens/soins_sante/mental_health/socialisation_mental_screen.dart';
+
+
+
+
 
 class MentalHealthScreen extends StatelessWidget {
   final List<Map<String, dynamic>> mentalWellness = [
     {
-      "title": "🧩 Jeux d’intelligence",
+      "title": "Jeux d’intelligence",
       "description": "Utilisez des jouets interactifs pour stimuler son cerveau.",
-      "image": "assets/images/puzzle_toys.png",
-      "color": Colors.deepPurple.shade400,
+      "image": "assets/images/soins/cerebral.png",
+      "color": Colors.brown.shade300,
+      "page": JeuxIntelligenceScreen(),
     },
     {
-      "title": "🎶 Musique et sons apaisants",
+      "title": "Musique et sons apaisants",
       "description": "Aidez votre chien à se détendre avec de la musique relaxante.",
-      "image": "assets/images/relaxing_music.png",
-      "color": Colors.blue.shade400,
+      "image": "assets/images/soins/music.png",
+      "color": Colors.brown.shade300,
+      "page": MusiqueApaisanteScreen(),
     },
     {
-      "title": "🤗 Socialisation",
+      "title": "Socialisation",
       "description": "Rencontrez d’autres chiens pour éviter l’ennui et la solitude.",
-      "image": "assets/images/socialization.png",
-      "color": Colors.green.shade400,
+      "image": "assets/images/soins/socialisation.png",
+      "color": Colors.brown.shade300,
+      "page": SocialisationMentalScreen(),
     },
     {
-      "title": "🏡 Routines et repères",
+      "title": "Routines et repères",
       "description": "Une routine stable réduit l’anxiété et renforce la confiance.",
-      "image": "assets/images/routine.png",
-      "color": Colors.orange.shade400,
+      "image": "assets/images/soins/routine.png",
+      "color": Colors.brown.shade300,
+      "page": RoutinesRepereScreen(),
     },
     {
-      "title": "🐾 Exercice et dépense physique",
+      "title": "Exercice et dépense physique",
       "description": "Un chien fatigué est un chien heureux et détendu.",
-      "image": "assets/images/physical_activity.png",
-      "color": Colors.red.shade400,
+      "image": "assets/images/soins/exercice.png",
+      "color": Colors.brown.shade300,
+      "page": ExerciceDepenseScreen(),
     },
     {
-      "title": "💆 Massage et caresses",
+      "title": "Massage et caresses",
       "description": "Apprenez à détendre votre chien avec des massages spécifiques.",
-      "image": "assets/images/massage.png",
-      "color": Colors.teal.shade400,
+      "image": "assets/images/soins/caresse.png",
+      "color": Colors.brown.shade300,
+      "page": MassageCaresseScreen(),
     },
   ];
 
@@ -57,6 +73,7 @@ class MentalHealthScreen extends StatelessWidget {
               item["image"],
               item["color"],
               context,
+              item["page"],
             );
           },
         ),
@@ -64,10 +81,12 @@ class MentalHealthScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWellnessCard(
-      String title, String description, String imagePath, Color bgColor, BuildContext context) {
+  Widget _buildWellnessCard(String title, String description, String imagePath, Color bgColor, BuildContext context, Widget page) {
     return GestureDetector(
-      onTap: () => _showWellnessDetail(context, title, description, imagePath),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => page),
+      ),
       child: Card(
         elevation: 6,
         margin: EdgeInsets.symmetric(vertical: 10),
@@ -79,115 +98,33 @@ class MentalHealthScreen extends StatelessWidget {
           ),
           child: Row(
             children: [
-              // ✅ Texte à gauche (70% de la largeur)
+              // Texte à gauche (70 %)
               Expanded(
-                flex: 7,
+                flex: 6,
                 child: Padding(
                   padding: EdgeInsets.all(10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        title,
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                      ),
+                      Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                       SizedBox(height: 5),
-                      Text(
-                        description,
-                        style: TextStyle(fontSize: 14, color: Colors.white70),
-                      ),
+                      Text(description, style: TextStyle(fontSize: 14, color: Colors.white70)),
                     ],
                   ),
                 ),
               ),
-              // ✅ Image totalement à droite (30% de la largeur)
+              // Image à droite (30 %)
               Expanded(
-                flex: 3,
+                flex: 4,
                 child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(15),
-                    bottomRight: Radius.circular(15),
-                  ),
-                  child: Image.asset(
-                    imagePath,
-                    fit: BoxFit.cover,
-                    height: 150,
-                  ),
+                  borderRadius: BorderRadius.only(topRight: Radius.circular(15), bottomRight: Radius.circular(15)),
+                  child: Image.asset(imagePath, fit: BoxFit.cover, height: 150),
                 ),
               ),
             ],
           ),
         ),
       ).animate().fade(duration: 500.ms).slideX(begin: 0.1),
-    );
-  }
-
-  void _showWellnessDetail(BuildContext context, String title, String description, String imagePath) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
-      builder: (context) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.6,
-          minChildSize: 0.4,
-          maxChildSize: 0.9,
-          builder: (context, scrollController) {
-            return ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-              child: Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-                  boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10, spreadRadius: 2)],
-                ),
-                child: Column(
-                  children: [
-                    // ✅ Titre et bouton de fermeture
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.close, size: 28, color: Colors.grey[700]),
-                          onPressed: () => Navigator.pop(context),
-                        ).animate().rotate(duration: 600.ms),
-                      ],
-                    ),
-                    Divider(),
-                    SizedBox(height: 10),
-                    // ✅ Image
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Image.asset(imagePath, height: 150, fit: BoxFit.cover),
-                    ).animate().fade(duration: 500.ms).scaleXY(begin: 0.9, end: 1),
-                    SizedBox(height: 15),
-                    // ✅ Description détaillée
-                    Expanded(
-                      child: SingleChildScrollView(
-                        controller: scrollController,
-                        child: Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Text(
-                            description,
-                            style: TextStyle(fontSize: 16, height: 1.5),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
     );
   }
 }

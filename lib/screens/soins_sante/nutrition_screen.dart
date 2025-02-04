@@ -1,43 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '/screens/soins_sante/nutrition/aliments_interdits_screen.dart';
+import '/screens/soins_sante/nutrition/friandises_saines_screen.dart';
+import '/screens/soins_sante/nutrition/glucides_avec_moderation_screen.dart';
+import '/screens/soins_sante/nutrition/hydratation_screen.dart';
+import '/screens/soins_sante/nutrition/legumes_et_fibres_screen.dart';
+import '/screens/soins_sante/nutrition/proteines_essentielles_screen.dart';
+
+
 
 class NutritionScreen extends StatelessWidget {
   final List<Map<String, dynamic>> nutritionTips = [
     {
-      "title": "🥩 Protéines essentielles",
-      "description": "Les chiens ont besoin de protéines animales pour leur croissance et leur énergie. Viandes maigres, œufs et poissons sont idéaux.",
-      "image": "assets/images/proteins.png",
-      "color": Colors.red.shade300,
+      "title": "Protéines essentielles",
+      "description":
+      "Les chiens ont besoin de protéines animales pour leur croissance et leur énergie. rotéines animales pour leur croissance et leur énergie.",
+      "image": "assets/images/soins/proteines.png",
+      "color": Colors.brown.shade300,
+      "page": ProteinesEssentiellesScreen(),
     },
     {
-      "title": "🥦 Légumes et fibres",
-      "description": "Ajoutez des légumes comme carottes, courgettes ou épinards pour améliorer la digestion et la santé intestinale.",
-      "image": "assets/images/vegetables.png",
-      "color": Colors.green.shade400,
+      "title": "Légumes et fibres",
+      "description":
+      "Ajoutez des légumes comme carottes, courgettes ou épinards pour améliorer la digestion et la santé intestinale.",
+      "image": "assets/images/soins/fibres.png",
+      "color": Colors.brown.shade300,
+      "page": LegumesEtFibresScreen(),
     },
     {
-      "title": "🥔 Glucides : avec modération",
-      "description": "Les glucides (riz, patates douces) fournissent de l'énergie, mais ne doivent pas dépasser 30% de l’alimentation.",
-      "image": "assets/images/carbs.png",
-      "color": Colors.orange.shade300,
+      "title": "Glucides : avec modération",
+      "description":
+      "Les glucides fournissent de l'énergie, mais ne doivent pas dépasser 30% de l’alimentation.",
+      "image": "assets/images/soins/glucides.png",
+      "color": Colors.brown.shade300,
+      "page": GlucidesAvecModerationScreen(),
     },
     {
-      "title": "🛑 Aliments interdits",
-      "description": "Évitez le chocolat, les raisins, l’oignon, l’ail et l’avocat qui sont toxiques pour les chiens.",
-      "image": "assets/images/forbidden_food.png",
-      "color": Colors.red.shade700,
+      "title": "Aliments interdits",
+      "description":
+      "Évitez le chocolat, les raisins, l’oignon, l’ail et l’avocat qui sont toxiques pour les chiens.",
+      "image": "assets/images/soins/chocolat.png",
+      "color": Colors.brown.shade300,
+      "page": AlimentsInterditsScreen(),
     },
     {
-      "title": "💧 L'importance de l’hydratation",
-      "description": "Un chien doit boire entre 50 et 100 ml d’eau par kilo et par jour pour rester en bonne santé.",
-      "image": "assets/images/hydration.png",
-      "color": Colors.blue.shade400,
+      "title": "L'importance de l’hydratation",
+      "description":
+      "Un chien doit boire entre 50 et 100 ml d’eau par kilo et par jour.",
+      "image": "assets/images/soins/hydratation.png",
+      "color": Colors.brown.shade300,
+      "page": HydratationScreen(),
     },
     {
-      "title": "🦴 Friandises saines",
-      "description": "Optez pour des friandises naturelles comme des morceaux de pommes, des bâtonnets de carottes ou des os à mâcher naturels.",
-      "image": "assets/images/treats.png",
-      "color": Colors.brown.shade400,
+      "title": "Friandises saines",
+      "description":
+      "Optez pour des friandises naturelles comme des morceaux de pommes, des bâtonnets de carottes ou des os à mâcher naturels.",
+      "image": "assets/images/soins/friandise.png",
+      "color": Colors.brown.shade300,
+      "page": FriandisesSainesScreen(),
     },
   ];
 
@@ -57,6 +77,9 @@ class NutritionScreen extends StatelessWidget {
               tip["image"],
               tip["color"],
               context,
+              tip["page"],
+              // On passe ici la page de détail à afficher lors du tap
+
             );
           },
         ),
@@ -65,9 +88,18 @@ class NutritionScreen extends StatelessWidget {
   }
 
   Widget _buildNutritionCard(
-      String title, String description, String imagePath, Color bgColor, BuildContext context) {
+      String title,
+      String description,
+      String imagePath,
+      Color bgColor,
+      BuildContext context,
+      Widget page,
+      ) {
     return GestureDetector(
-      onTap: () => _showNutritionDetail(context, title, description, imagePath),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => page),
+      ),
       child: Card(
         elevation: 6,
         margin: EdgeInsets.symmetric(vertical: 10),
@@ -79,9 +111,9 @@ class NutritionScreen extends StatelessWidget {
           ),
           child: Row(
             children: [
-              // ✅ Texte à gauche (prend 70% de la largeur)
+              // Texte à gauche (70%)
               Expanded(
-                flex: 7,
+                flex: 6,
                 child: Padding(
                   padding: EdgeInsets.all(10),
                   child: Column(
@@ -89,7 +121,11 @@ class NutritionScreen extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                       SizedBox(height: 5),
                       Text(
@@ -100,9 +136,9 @@ class NutritionScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              // ✅ Image totalement à droite (prend 30% de la largeur)
+              // Image à droite (30%)
               Expanded(
-                flex: 3,
+                flex: 4,
                 child: ClipRRect(
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(15),
@@ -119,75 +155,6 @@ class NutritionScreen extends StatelessWidget {
           ),
         ),
       ).animate().fade(duration: 500.ms).slideX(begin: 0.1),
-    );
-  }
-
-  void _showNutritionDetail(BuildContext context, String title, String description, String imagePath) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
-      builder: (context) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.6,
-          minChildSize: 0.4,
-          maxChildSize: 0.9,
-          builder: (context, scrollController) {
-            return ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-              child: Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-                  boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10, spreadRadius: 2)],
-                ),
-                child: Column(
-                  children: [
-                    // ✅ Titre et bouton de fermeture
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.close, size: 28, color: Colors.grey[700]),
-                          onPressed: () => Navigator.pop(context),
-                        ).animate().rotate(duration: 600.ms),
-                      ],
-                    ),
-                    Divider(),
-                    SizedBox(height: 10),
-                    // ✅ Image
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Image.asset(imagePath, height: 150, fit: BoxFit.cover),
-                    ).animate().fade(duration: 500.ms).scaleXY(begin: 0.9, end: 1),
-                    SizedBox(height: 15),
-                    // ✅ Description détaillée
-                    Expanded(
-                      child: SingleChildScrollView(
-                        controller: scrollController,
-                        child: Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Text(
-                            description,
-                            style: TextStyle(fontSize: 16, height: 1.5),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
     );
   }
 }
